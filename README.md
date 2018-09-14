@@ -31,6 +31,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+**Description**
+
 This project demonstrates hardware-accelerated FaaS. Select the folder corresponding to the Cloud Service Provider you'd like to work with.
 
 Report security problems to: https://01.org/security
