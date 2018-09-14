@@ -1,4 +1,4 @@
-Hardware-accelerated Function-as-a-Service Using AWS Greengrass\* (Beta)
+# Hardware-accelerated Function-as-a-Service Using AWS Greengrass
 
 Hardware accelerated Function-as-a-Service (FaaS) enables cloud
 developers to deploy inference functionalities on Intel® IoT edge
