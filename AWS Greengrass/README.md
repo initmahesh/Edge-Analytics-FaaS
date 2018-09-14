@@ -1,6 +1,7 @@
 # Hardware-accelerated Function-as-a-Service Using AWS Greengrass
 
 **License**
+
 BSD 3-clause "New" or "Revised" license
 
 Copyright (C) 2018 Intel Coporation.
