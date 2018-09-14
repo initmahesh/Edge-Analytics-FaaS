@@ -153,9 +153,9 @@ For example:
     editing the lambda configuration and click on **Update**:
 
   -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  **Key**                       **Value**
+  **Key** | **Value**
   ----------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  LD\_LIBRARY\_PATH             \<INSTALL\_DIR\>/opencv/share/OpenCV/3rdparty/lib:\
+  LD\_LIBRARY\_PATH |           \<INSTALL\_DIR\>/opencv/share/OpenCV/3rdparty/lib:\
                                 \<INSTALL\_DIR\>/opencv/lib:/opt/intel/opencl:\
                                 \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/external/cldnn/lib:\
                                 \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/external/mkltiny\_lnx/lib:\
@@ -163,28 +163,28 @@ For example:
                                 \<INSTALL\_DIR\>/deployment\_tools/model\_optimizer/model\_optimizer\_caffe/bin:\
                                 \<INSTALL\_DIR\>/openvx/lib
 
-  PYTHONPATH                    \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/python\_api/Ubuntu\_1604/python2
+  PYTHONPATH | \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/python\_api/Ubuntu\_1604/python2
 
-  PARAM\_MODEL\_XML             \<MODEL\_DIR\>/\<IR.xml\>, where \<MODEL\_DIR\> is user specified and contains IR.xml, the Intermediate Representation file from Intel Model Optimizer
+  PARAM\_MODEL\_XML | \<MODEL\_DIR\>/\<IR.xml\>, where \<MODEL\_DIR\> is user specified and contains IR.xml, the Intermediate Representation file from Intel Model Optimizer
 
-  PARAM\_INPUT\_SOURCE          \<DATA\_DIR\>/input.mp4 to be specified by user. Holds both input and output data.
+  PARAM\_INPUT\_SOURCE | \<DATA\_DIR\>/input.mp4 to be specified by user. Holds both input and output data.
 
-  PARAM\_DEVICE                 For CPU, specify \`CPU\`. For GPU, specify \`GPU\`. For FPGA, specify \`HETERO:FPGA,CPU\`.
+  PARAM\_DEVICE         |        For CPU, specify \`CPU\`. For GPU, specify \`GPU\`. For FPGA, specify \`HETERO:FPGA,CPU\`.
 
-  PARAM\_CPU\_EXTENSION\_PATH   \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/lib/Ubuntu\_16.04/intel64/\<CPU\_EXTENSION\_LIB\>, where CPU\_EXTENSION\_LIB is libcpu\_extension\_sse4.so for Intel Atom® processors and libcpu\_extension\_avx2.so for Intel® Core™ and Intel® Xeon® processors.
+  PARAM\_CPU\_EXTENSION\_PATH  | \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/lib/Ubuntu\_16.04/intel64/\<CPU\_EXTENSION\_LIB\>, where CPU\_EXTENSION\_LIB is libcpu\_extension\_sse4.so for Intel Atom® processors and libcpu\_extension\_avx2.so for Intel® Core™ and Intel® Xeon® processors.
 
-  PARAM\_OUTPUT\_DIRECTORY      \<DATA\_DIR\> to be specified by user. Holds both input and output data.
-
-  PARAM\_NUM\_TOP\_RESULTS      User specified for classification sample (e.g. 1 for top-1 result, 5 for top-5 results)
-  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  PARAM\_OUTPUT\_DIRECTORY   |   \<DATA\_DIR\> to be specified by user. Holds both input and output data.
+  PARAM\_NUM\_TOP\_RESULTS   |   User specified for classification sample (e.g. 1 for top-1 result, 5 for top-5 results) 
+  
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -   Use below LD\_LIBRARY\_PATH and additional environment variables for
     Intel® Arria® 10 GX FPGA Development Kit:
 
   ----------------------------------------------------------------------------------------------------------------------------
-  **Key**                                  **Value**
+  **Key**          |                        **Value**
   ---------------------------------------- -----------------------------------------------------------------------------------
-  LD\_LIBRARY\_PATH                        /opt/altera/aocl-pro-rte/aclrte-linux64/board/a10\_ref/linux64/lib:\
+  LD\_LIBRARY\_PATH  |                      /opt/altera/aocl-pro-rte/aclrte-linux64/board/a10\_ref/linux64/lib:\
                                            /opt/altera/aocl-pro-rte/aclrte-linux64/host/linux64/lib:\
                                            \<INSTALL\_DIR\>/opencv/share/OpenCV/3rdparty/lib:\
                                            \<INSTALL\_DIR\>/opencv/lib:/opt/intel/opencl:\
@@ -194,9 +194,10 @@ For example:
                                            \<INSTALL\_DIR\>/deployment\_tools/model\_optimizer/model\_optimizer\_caffe/bin:\
                                            \<INSTALL\_DIR\>/openvx/lib
 
-  DLA\_AOCX                                \<INSTALL\_DIR\>/a10\_devkit\_bitstreams/0-8-1\_a10dk\_fp16\_8x48\_arch06.aocx
+  DLA\_AOCX  |                              \<INSTALL\_DIR\>/a10\_devkit\_bitstreams/0-8-1\_a10dk\_fp16\_8x48\_arch06.aocx
 
-  CL\_CONTEXT\_COMPILER\_MODE\_INTELFPGA   3
+  CL\_CONTEXT\_COMPILER\_MODE\_INTELFPGA |  3
+  
   ----------------------------------------------------------------------------------------------------------------------------
 
 -   Add subscription to subscribe or publish messages from AWS
