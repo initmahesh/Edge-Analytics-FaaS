@@ -31,6 +31,8 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+**Instructions**
+
 Hardware accelerated Function-as-a-Service (FaaS) enables cloud
 developers to deploy inference functionalities on Intel® IoT edge
 devices with accelerators (Intel® Processor Graphics, Intel® FPGA, and
