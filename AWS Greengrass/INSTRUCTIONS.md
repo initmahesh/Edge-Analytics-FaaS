@@ -1,4 +1,4 @@
-Hardware-accelerated Function-as-a-Service Using AWS Greengrass (Beta Release)
+Hardware-accelerated Function-as-a-Service Using AWS Greengrass
 =================
 
 Table of contents
@@ -41,7 +41,7 @@ Supported Platforms
 Pre-requisites for Intel Edge Devices
 =================
 
-* Download and install OpenVINO Toolkit from https://software.intel.com/en-us/openvino-toolkit
+* Download and install OpenVINO R1.3 Toolkit from https://software.intel.com/en-us/openvino-toolkit
 * For configuring GPU to use OpenVINO, follow the instructions under section “Additional Installation Steps for Processor Graphics (GPU)” at
 https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 * Python 2.7 with opencv-python, numpy, boto3 (use the below commands to install the packages)
@@ -53,7 +53,7 @@ https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 Description of Samples
 =================
 
-The Greengrass samples are part of OpenVINO R1.2 release. They are located at <INSTALL_DIR>/deployment_tools/inference_engine/samples/python_samples/greengrass_samples, where <INSTALL_DIR> refers to OpenVINO installation directory throughout this document. By default, <INSTALL_DIR> is /opt/intel/computer_vision_sdk.
+The Greengrass samples are part of OpenVINO release. They are located at <INSTALL_DIR>/deployment_tools/inference_engine/samples/python_samples/greengrass_samples, where <INSTALL_DIR> refers to OpenVINO installation directory throughout this document. By default, <INSTALL_DIR> is /opt/intel/computer_vision_sdk.
 
 We provide the following Greengrass samples:
 * greengrass_classification_sample.py
