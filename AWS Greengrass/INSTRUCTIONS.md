@@ -1,4 +1,4 @@
-Hardware-accelerated Function-as-a-Service Using AWS Greengrass
+Hardware-accelerated Function-as-a-Service Using AWS Greengrass (Beta Release)
 =================
 
 Table of contents
@@ -41,7 +41,7 @@ Supported Platforms
 Pre-requisites for Intel Edge Devices
 =================
 
-* Download and install OpenVINO Toolkit R1.3 from https://software.intel.com/en-us/openvino-toolkit
+* Download and install OpenVINO Toolkit from https://software.intel.com/en-us/openvino-toolkit
 * For configuring GPU to use OpenVINO, follow the instructions under section “Additional Installation Steps for Processor Graphics (GPU)” at
 https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 * Python 2.7 with opencv-python, numpy, boto3 (use the below commands to install the packages)
@@ -53,7 +53,7 @@ https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 Description of Samples
 =================
 
-The Greengrass samples are part of OpenVINO release. They are located at <INSTALL_DIR>/deployment_tools/inference_engine/samples/python_samples/greengrass_samples, where <INSTALL_DIR> refers to OpenVINO installation directory throughout this document. By default, <INSTALL_DIR> is /opt/intel/computer_vision_sdk. 
+The Greengrass samples are part of OpenVINO R1.2 release. They are located at <INSTALL_DIR>/deployment_tools/inference_engine/samples/python_samples/greengrass_samples, where <INSTALL_DIR> refers to OpenVINO installation directory throughout this document. By default, <INSTALL_DIR> is /opt/intel/computer_vision_sdk.
 
 We provide the following Greengrass samples:
 * greengrass_classification_sample.py
@@ -147,7 +147,6 @@ Configuring the Lambda Function
 Local Resources
 -----------
 
-<<<<<<< HEAD
 * Add local resources and access privileges by following the instructions https://docs.aws.amazon.com/greengrass/latest/developerguide/access-local-resources.html
 * Following are the local resources needed for various hardware (CPU,GPU and FPGA) options:
 
@@ -173,31 +172,9 @@ Local Resources
     FPGA | Device | /dev/acla10_ref0 | Read and Write
     FPGA_DIR1 | Volume | /opt/Intel/OpenCL/Boards | Read-Only
     FPGA_DIR2 | Volume | /etc/OpenCL/vendors | Read-Only
-=======
-  -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
- | **Key** | **Value**|
- | -----------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-  |LD\_LIBRARY\_PATH |           \<INSTALL\_DIR\>/opencv/share/OpenCV/3rdparty/lib:\
-  ||                              \<INSTALL\_DIR\>/opencv/lib:/opt/intel/opencl:\
-  ||                              \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/external/cldnn/lib:\
-  ||                              \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/external/mkltiny\_lnx/lib:\
-  ||                              \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/lib/ubuntu\_16.04/intel64:\
-  ||                              \<INSTALL\_DIR\>/deployment\_tools/model\_optimizer/model\_optimizer\_caffe/bin:\
-  ||                              \<INSTALL\_DIR\>/openvx/lib|
-  |PYTHONPATH | \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/python\_api/Ubuntu\_1604/python2|
- | PARAM\_MODEL\_XML | \<MODEL\_DIR\>/\<IR.xml\>, where \<MODEL\_DIR\> is user specified and contains IR.xml, the Intermediate Representation file from Intel Model Optimizer|
- | PARAM\_INPUT\_SOURCE | \<DATA\_DIR\>/input.mp4 to be specified by user. Holds both input and output data.|
- | PARAM\_DEVICE         |        For CPU, specify \`CPU\`. For GPU, specify \`GPU\`. For FPGA, specify \`HETERO:FPGA,CPU\`.|
- | PARAM\_CPU\_EXTENSION\_PATH  | \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/lib/Ubuntu\_16.04/intel64/\<CPU\_EXTENSION\_LIB\>, where CPU\_EXTENSION\_LIB is libcpu\_extension\_sse4.so for Intel Atom® processors and libcpu\_extension\_avx2.so for Intel® Core™ and Intel® Xeon® processors.|
- | PARAM\_OUTPUT\_DIRECTORY   |   \<DATA\_DIR\> to be specified by user. Holds both input and output data.|
- | PARAM\_NUM\_TOP\_RESULTS   |   User specified for classification sample (e.g. 1 for top-1 result, 5 for top-5 results)|
-  
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
->>>>>>> d2f268b8679296f3f79543bf05ab114e0cd285c9
 
   * Movidius:
 
-<<<<<<< HEAD
     Movidius hasn’t been validated with Greengrass yet. This section will be updated in future releases.
 
 Deployment
@@ -238,115 +215,3 @@ References
 [2] AWS Lambda: https://aws.amazon.com/lambda/
 
 [3] AWS Kinesis: https://aws.amazon.com/kinesis/
-=======
-  ----------------------------------------------------------------------------------------------------------------------------
- | **Key**          |                        **Value**|
-  |----------------------------------------| -----------------------------------------------------------------------------------
-  |LD\_LIBRARY\_PATH  |                      /opt/altera/aocl-pro-rte/aclrte-linux64/board/a10\_ref/linux64/lib:\|
-  ||                                         /opt/altera/aocl-pro-rte/aclrte-linux64/host/linux64/lib:\|
-  ||                                         \<INSTALL\_DIR\>/opencv/share/OpenCV/3rdparty/lib:\|
-  ||                                         \<INSTALL\_DIR\>/opencv/lib:/opt/intel/opencl:\|
-  ||                                         \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/external/cldnn/lib:\|
-  ||                                         \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/external/mkltiny\_lnx/lib:\|
-  ||                                         \<INSTALL\_DIR\>/deployment\_tools/inference\_engine/lib/ubuntu\_16.04/intel64:\|
-  ||                                         \<INSTALL\_DIR\>/deployment\_tools/model\_optimizer/model\_optimizer\_caffe/bin:\|
-  ||                                         \<INSTALL\_DIR\>/openvx/lib|
-  | DLA\_AOCX  |                              \<INSTALL\_DIR\>/a10\_devkit\_bitstreams/0-8-1\_a10dk\_fp16\_8x48\_arch06.aocx|
-  |CL\_CONTEXT\_COMPILER\_MODE\_INTELFPGA |  3|
-  
-  ----------------------------------------------------------------------------------------------------------------------------
-
--   Add subscription to subscribe or publish messages from AWS
-    Greengrass lambda function by following the steps 10-14 in AWS
-    Greengrass developer guide
-    at: [[https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.html]{.underline}](https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.html).
-    The "Optional topic filter" field should be the topic mentioned
-    inside the lambda function. For
-    example, openvino/ssd or openvino/classification.
-
-**Local Resources**
-
--   Add local resources and access privileges by following the
-    instructions [[https://docs.aws.amazon.com/greengrass/latest/developerguide/access-local-resources.html]{.underline}](https://docs.aws.amazon.com/greengrass/latest/developerguide/access-local-resources.html)
-
--   Following are the local resources needed for various hardware (CPU,
-    GPU and FPGA) options:
-
-    -   **General (for all hardware options):**
-
- | **Name**   |    **Resource Type** |  **Local Path**    |                                                           **Access**|
- | --------------| -------------------| ----------------------------------------------------------------------------| ----------------|
- | ModelDir       |Volume              |\<MODEL\_DIR\> to be specified by user                                       |Read-Only|
- | Webcam         |Device              |/dev/video0                                                                  |Read-Only|
- | DataDir        |Volume              |\<DATA\_DIR\> to be specified by user. Holds both input and output data.     |Read and Write|
- | OpenVINOPath   |Volume              |\<INSTALL\_DIR\> where INSTALL\_DIR is the OpenVINO installation directory   |Read-Only|
-
--   **GPU:**
-
-  |**Name**  | **Resource Type**  | **Local Path**  |      **Access**|
-  |----------| -------------------| ---------------------| ----------------|
- | GPU    |    Device     |         /dev/dri/renderD128  | Read and Write|
-
--   **FPGA:**
-
-  |**Name**  |   **Resource Type**  | **Local Path**    |         **Access**|
-  |------------| -------------------| --------------------------| ----------------|
-  |FPGA         |Device             |/dev/acla10\_ref0          |Read and Write|
-  |FPGA\_DIR1   |Volume             |/opt/Intel/OpenCL/Boards   |Read and Write|
-  |FPGA\_DIR2   |Volume             |/etc/OpenCL/vendors        |Read and Write|
-
--   **VPU:**\
-    Intel® Movidius™ Myriad™ VPU has not been validated with AWS
-    Greengrass yet. This section will be updated in future releases.
-
-**Deploy**
-
-To deploy the lambda function to AWS Greengrass core device, select
-"Deployments" on group page and follow the instructions
-at: [[https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html]{.underline}](https://docs.aws.amazon.com/greengrass/latest/developerguide/configs-core.html).
-
-**Output Consumption**
-
-There are four options available for output consumption. These options
-are used to report/stream/upload/store inference output at an interval
-defined by the variable 'reporting\_interval' in the AWS Greengrass
-samples. 
-
-1.  AWS IoT\* Cloud Output\
-    This option is enabled by default in the AWS Greengrass samples
-    using a variable 'enable\_iot\_cloud\_output'.  We can use it to
-    verify the lambda running on the edge device. It enables publishing
-    messages to AWS IoT cloud using the subscription topic specified in
-    the lambda (For example, openvino/classification for classification
-    and openvino/ssd for object detection samples). For classification,
-    top-1 result with class label are published to AWS IoT cloud. For
-    SSD object detection, detection results such as bounding box
-    co-ordinates of objects, class label, and class confidence are
-    published. To view the output on AWS IoT cloud, follow the
-    instructions at
-    https://docs.aws.amazon.com/greengrass/latest/developerguide/lambda-check.html
-
-2.  AWS Kinesis Streaming\
-    This option enables inference output to be streamed from the edge
-    device to cloud using AWS Kinesis streams when
-    'enable\_kinesis\_output' is set to True. The edge devices act as
-    data producers and continually push processed data to the cloud. The
-    users need to set up and specify AWS Kinesis stream name, AWS
-    Kinesis shard, and AWS region in the AWS Greengrass samples.
-
-3.  Cloud Storage using AWS S3 Bucket\
-    This option enables uploading and storing processed frames (in JPEG
-    format) in an AWS S3\* bucket when
-    the enable\_s3\_jpeg\_output variable is set to True. The users need
-    to set up and specify the AWS S3 bucket name in the AWS Greengrass
-    samples to store the JPEG images. The images are named using the
-    timestamp and uploaded to AWS S3.
-
-4.  Local Storage\
-    This option enables storing processed frames (in JPEG format) on the
-    edge device when the enable\_s3\_jpeg\_output variable is set
-    to True. The images are named using the timestamp and stored in a
-    directory specified by PARAM\_OUTPUT\_DIRECTORY.
-
-Report security problems to: https://01.org/security
->>>>>>> d2f268b8679296f3f79543bf05ab114e0cd285c9
