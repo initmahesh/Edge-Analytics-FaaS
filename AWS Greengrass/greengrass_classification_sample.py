@@ -38,6 +38,7 @@ import boto3
 import timeit
 import datetime
 import json
+from collections import OrderedDict 
 
 from openvino.inference_engine import IENetwork, IEPlugin
 
@@ -46,7 +47,6 @@ reporting_interval = 1.0
 
 # Parameters for IoT Cloud
 enable_iot_cloud_output = True
-topic_name = "openvino/classification"
 
 # Parameters for Kinesis
 enable_kinesis_output = False
@@ -65,10 +65,12 @@ enable_local_jpeg_output = False
 client = greengrasssdk.client("iot-data")
 
 # Create an S3 client for uploading files to S3
-s3_client = boto3.client("s3")
+if enable_s3_jpeg_output:
+    s3_client = boto3.client("s3")
 
 # Create a Kinesis client for putting records to streams
-kinesis_client = boto3.client("kinesis", "us-west-2")
+if enable_kinesis_output:
+    kinesis_client = boto3.client("kinesis", "us-west-2")
 
 # Read environment variables set by Lambda function configuration
 PARAM_MODEL_XML = os.environ.get("PARAM_MODEL_XML")
@@ -76,14 +78,16 @@ PARAM_INPUT_SOURCE = os.environ.get("PARAM_INPUT_SOURCE")
 PARAM_DEVICE = os.environ.get("PARAM_DEVICE")
 PARAM_OUTPUT_DIRECTORY = os.environ.get("PARAM_OUTPUT_DIRECTORY")
 PARAM_CPU_EXTENSION_PATH = os.environ.get("PARAM_CPU_EXTENSION_PATH")
-PARAM_NUM_TOP_RESULTS = int(os.environ.get("PARAM_NUM_TOP_RESULTS"))
+PARAM_LABELMAP_FILE = os.environ.get("PARAM_LABELMAP_FILE")
+PARAM_TOPIC_NAME = os.environ.get("PARAM_TOPIC_NAME", "intel/faas/classification")
+PARAM_NUM_TOP_RESULTS = int(os.environ.get("PARAM_NUM_TOP_RESULTS", "10"))
 
 def report(res_json, frame):
     now = datetime.datetime.now()
     date_prefix = str(now).replace(" ", "_")
     if enable_iot_cloud_output:
         data = json.dumps(res_json)
-        client.publish(topic=topic_name, payload=data)
+        client.publish(topic=PARAM_TOPIC_NAME, payload=data)
     if enable_kinesis_output:
         kinesis_client.put_record(StreamName=kinesis_stream_name, Data=json.dumps(res_json), PartitionKey=kinesis_partition_key)
     if enable_s3_jpeg_output:
@@ -91,12 +95,13 @@ def report(res_json, frame):
         cv2.imwrite(temp_image, frame)
         with open(temp_image) as file:
             image_contents = file.read()
-            s3_client.put_object(Body=image_contents, Bucket=s3_bucket_name, Key=date_prefix + ".jpeg")
+            s3_client.put_object(Body=image_contents, Bucket=s3_bucket_name, Key=date_prefix + ".jpeg") 
     if enable_local_jpeg_output:
         cv2.imwrite(os.path.join(PARAM_OUTPUT_DIRECTORY, date_prefix + ".jpeg"), frame)
-        
+
+    
 def greengrass_classification_sample_run():
-    client.publish(topic=topic_name, payload="OpenVINO: Initializing...")
+    client.publish(topic=PARAM_TOPIC_NAME, payload="OpenVINO: Initializing...")
     model_bin = os.path.splitext(PARAM_MODEL_XML)[0] + ".bin"
 
     # Plugin initialization for specified device and load extensions library if specified
@@ -114,35 +119,58 @@ def greengrass_classification_sample_run():
     cap = cv2.VideoCapture(PARAM_INPUT_SOURCE)
     exec_net = plugin.load(network=net)
     del net
-    client.publish(topic=topic_name, payload="Starting inference on %s" % PARAM_INPUT_SOURCE)
+    client.publish(topic=PARAM_TOPIC_NAME, payload="Starting inference on %s" % PARAM_INPUT_SOURCE)
     start_time = timeit.default_timer()
+    inf_seconds = 0.0
+    frame_count = 0
+    res_json = []
+    labeldata = None
+    if PARAM_LABELMAP_FILE is not None:
+       with open(PARAM_LABELMAP_FILE) as labelmap_file:
+            labeldata = json.load(labelmap_file)
+    
     while (cap.isOpened()):
         ret, frame = cap.read()
         if not ret:
             break
-        frame = cv2.resize(frame, (w, h))
-        in_frame = frame.transpose((2, 0, 1))  # Change data layout from HWC to CHW
+        frameid = cap.get(cv2.CAP_PROP_POS_FRAMES)
+        initial_w = cap.get(3)
+        initial_h = cap.get(4)
+        in_frame = cv2.resize(frame, (w, h))
+        in_frame = in_frame.transpose((2, 0, 1))  # Change data layout from HWC to CHW
         in_frame = in_frame.reshape((n, c, h, w))
-
-        # Start sync inference
+        # Start synchronous inference
+        inf_start_time = timeit.default_timer()
         res = exec_net.infer(inputs={input_blob: in_frame})
+        inf_seconds += timeit.default_timer() - inf_start_time
         top_ind = np.argsort(res[out_blob], axis=1)[0, -PARAM_NUM_TOP_RESULTS:][::-1]
-        res_json = []
+        # Parse detection results of the current request
+        res_json = OrderedDict()
+        res_json["Candidates"] = OrderedDict()
+        frame_timestamp = datetime.datetime.now()
+            
         for i in top_ind:
-            res_json.append({"confidence": round(res[out_blob][0, i], 2), "label": i})
-        
+            classlabel = labeldata[str(i)] if labeldata else str(i)
+            res_json["Candidates"][classlabel] = round(res[out_blob][0, i], 2)
+            
+        frame_count += 1
         # Measure elapsed seconds since the last report
         seconds_elapsed = timeit.default_timer() - start_time
         if seconds_elapsed >= reporting_interval:
-            report(res_json, frame)
+            res_json["timestamp"] = frame_timestamp.isoformat()
+            res_json["frame_id"] = int(frameid)   
+            res_json["inference_fps"] = frame_count / inf_seconds
             start_time = timeit.default_timer()
+            report(res_json, frame)
+            frame_count = 0
+            inf_seconds = 0.0
 
-    client.publish(topic=topic_name, payload="End of the input, exiting...")
+    client.publish(topic=PARAM_TOPIC_NAME, payload="End of the input, exiting...")
     del exec_net
     del plugin
 
 greengrass_classification_sample_run()
 
 def function_handler(event, context):
-    client.publish(topic=topic_name, payload='HANDLER_CALLED!')
+    client.publish(topic=PARAM_TOPIC_NAME, payload='HANDLER_CALLED!')
     return
