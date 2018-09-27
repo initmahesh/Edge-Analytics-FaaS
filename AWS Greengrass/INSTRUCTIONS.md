@@ -41,7 +41,7 @@ Supported Platforms
 Pre-requisites for Intel Edge Devices
 =================
 
-* Download and install OpenVINO R1.3 Toolkit from https://software.intel.com/en-us/openvino-toolkit
+* Download and install OpenVINO R3 Toolkit from https://software.intel.com/en-us/openvino-toolkit
 * For configuring GPU to use OpenVINO, follow the instructions under section “Additional Installation Steps for Processor Graphics (GPU)” at
 https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 * Python 2.7 with opencv-python, numpy, boto3 (use the below commands to install the packages)
