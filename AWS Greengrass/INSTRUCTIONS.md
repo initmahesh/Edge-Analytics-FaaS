@@ -68,17 +68,54 @@ Converting Deep Learning Models
 =================
 
 Downloading Sample Models
------------
+-------------------
 
 For classification, download the BVLC Alexnet model (deploy.prototxt and bvlc_alexnet.caffemodel) as an example from https://github.com/BVLC/caffe/tree/master/models/bvlc_alexnet. Any custom pre-trained classification models can be used with the classification sample.
 
-For object detection, download Intel Edge optimized models available at https://github.com/intel/Edge-optimized-models. These models are provided as an example, but any custom pre-trained SSD models can be used with the object detection sample.
+For object detection, download Intel Edge optimized models available at https://github.com/intel/Edge-optimized-models. These models are provided as an example, but any custom pre-trained SSD models can be used with the object detection sample. 
 
-Setting up & Running Model Optimizer
------------
+Setting up Model Optimizer
+---------------------
 
-For setting up Model Optimizer and converting deep learning models to Intermediate Representation (IR), follow the instructions at: https://software.intel.com/en-us/articles/OpenVINO-ModelOptimizer.
+Below steps describe installing pre-requisites and setting up environment variables for Model Optimizer:
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+source <INSTALL_DIR>/bin/setupvars.sh
+cd <INSTALL_DIR>/deployment_tools/model_optimizer/install_prerequisites
+sudo –E ./install_prerequisites.sh
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Model Optimizer uses Python 3.5, whereas Greengrass samples use Python 2.7. In order for Model Optimizer not to influence the global Python configuration, activate a virtual environment as below:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cd <INSTALL_DIR>/deployment_tools/model_optimizer
+source venv/bin/activate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Running Model Optimizer
+--------------------
+
+For converting deep learning models to Intermediate Representation (IR) using Model Optimizer, follow the instructions at: https://software.intel.com/en-us/articles/OpenVINO-ModelOptimizer. For example, for above models use the following commands.
+
+For CPU, models should be converted with data type FP32 and for GPU/FPGA, it should be with data type FP16 for the best performance.
+
+For classification using BVLC Alexnet model,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 mo.py --framework caffe --input_model <model_location>/bvlc_alexnet.caffemodel --input_proto <model_location>/deploy.prototxt --data_type <data_type> --output_dir <output_dir> --input_shape [1,3,227,227]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+For object detection using SqueezeNetSSD-5Class model,
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+python3 mo.py --framework caffe --input_model <model_location>/SqueezeNetSSD-5Class.caffemodel --input_proto <model_location>/SqueezeNetSSD-5Class.prototxt --data_type <data_type> --output_dir <output_dir>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+where <model_location> is the location where the user downloaded the models, <data_type> is FP32 or FP16 depending on target device, and <output_dir> is the directory where the user wants to store the IR. IR contains .xml format corresponding to the network structure and .bin format corresponding to weights. This .xml should be passed to <PARAM_MODEL_XML> mentioned in Section 8.1. In the BVLC Alexnet model, the prototxt defines the input shape with batch size 10 by default. In order to use any other batch size, the entire input shape needs to be provided as an argument to the model optimizer. For example, if you want to use batch size 1, you can provide “--input_shape [1,3,227,227]”.
+
+To deactivate the virtual environment after converting the model, use the below command:
+
+`deactivate`
 
 Configuring a Greengrass group
 =================
