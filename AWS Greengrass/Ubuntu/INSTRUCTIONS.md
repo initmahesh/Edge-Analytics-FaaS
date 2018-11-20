@@ -81,15 +81,14 @@ Below steps describe installing pre-requisites and setting up environment variab
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 source <INSTALL_DIR>/bin/setupvars.sh
-cd <INSTALL_DIR>/deployment_tools/model_optimizer/install_prerequisites
-sudo –E ./install_prerequisites.sh
+cd <INSTALL_DIR>/deployment_tools/model_optimizer/install_prerequisites/
+sudo ./install_prerequisites.sh
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Model Optimizer uses Python 3.5, whereas Greengrass samples use Python 2.7. In order for Model Optimizer not to influence the global Python configuration, activate a virtual environment as below:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cd <INSTALL_DIR>/deployment_tools/model_optimizer
-source venv/bin/activate
+source <INSTALL_DIR>/deployment_tools/model_optimizer/install_prerequisites/../venv/bin/activate
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Running Model Optimizer
