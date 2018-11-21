@@ -190,10 +190,13 @@ Local Resources
 
     Name | Resource Type | Local Path | Access
     ------------- |------------- | ------------- | -------------
-    ModelDir | Volume | <MODEL_DIR> to be specified by user | Read-Only
-    Webcam | Device | /dev/video0 | Read and Write
-    DataDir | Volume | <DATA_DIR> to be specified by user. Holds both input and output data. | Read and Write
-    OpenVINOPath | Volume | <INSTALL_DIR> where INSTALL_DIR is the OpenVINO installation directory | Read-Only
+    ModelDir | Volume | <MODEL_DIR> to be specified by user. This directory should contain intermediate representation of pretrained models optimized by model optimizer.  For further information: refer to https://software.intel.com/en-us/articles/OpenVINO-ModelOptimizer .
+Supported file types: .xml (holds deep learning network architecture), .bin (contains model weights).
+eg:/opt/intel/model/<your_xml_file_name>.xml | Read-Only
+    Webcam | Device | /dev/video0 : a standard format for USB cameras. For any other camera types, user has to specify the camera device path.| Read and Write
+    DataDir | Volume | <DATA_DIR> to be specified by user. Holds both input and output data. For eg. /opt/intel/data/<your video input>.
+Validated with .mp4 format. Other custom video formats have to be tested and validated by the user. | Read and Write
+    OpenVINOPath | Volume |<INSTALL_DIR> where INSTALL_DIR is the OpenVINO installation directory. For eg. /opt/intel/computer_vision_sdk_2018.3.343/| Read-Only
 
   * GPU:
 
