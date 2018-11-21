@@ -115,7 +115,7 @@ def greengrass_classification_sample_run():
     input_blob = next(iter(net.inputs))
     out_blob = next(iter(net.outputs))
     # Read and pre-process input image
-    n, c, h, w = net.inputs[input_blob]
+    n, c, h, w = net.inputs[input_blob].shape
     cap = cv2.VideoCapture(PARAM_INPUT_SOURCE)
     exec_net = plugin.load(network=net)
     del net

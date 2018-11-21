@@ -10,7 +10,7 @@
    * [Converting Deep Learning Models for Inference Engine](#converting-deep-learning-models-for-inference-engine)
    * [Configuring Azure Iot Edge](#configuring-azure-iot-edge)
    * [Creating FaaS modules from code samples](#creating-faas-modules-from-code-samples)
-   * [Deploying the FaaS modules on Edge device](#deploying-the-faas-modules-on-edge-devices)
+   * [Deploying the FaaS modules on Edge device](#deploying-the-faas-modules-on-edge-device)
    * [Output Consumption](#output-consumption)
    * [Optional: Integration with Azure Functions](#optional-integration-with-azure-functions)
    * [References](#references)
@@ -20,7 +20,7 @@
 
 Hardware accelerated Function-as-a-Service (FaaS) enables cloud developers to deploy inference functionalities on Intel IoT edge devices with accelerators (Integrated GPU, FPGA, and Movidius).  These functions provide a great developer experience and seamless migration of visual analytics from cloud to edge in a secure manner using containerized environment. Hardware-accelerated FaaS provides the best-in-class performance by accessing optimized deep learning libraries on Intel IoT edge devices with accelerators.
 	
-This document describes implementation of FaaS inference samples (based on Python 3.5) on Azure Iot Edge [1] using Docker images [2]. These functions can be created, modified, and updated in the cloud and can be deployed from cloud to edge using Azure Iot Edge Runtime. This document covers description of samples, pre-requisites for Intel edge device, configuring a Azure Iot Hub, creating and packaging docker images, deployment of docker images and how to consume the inference output. 
+This document describes the creation and deployment of FaaS inference samples (based on Python 3.5) using Azure's Iot Edge service [1]. These functions can be created, modified, and updated in the cloud and can be deployed from cloud to edge using Azure Iot Edge Runtime. This document covers description of samples, pre-requisites for Intel edge device, configuring a Azure Iot Hub, creating and packaging docker images, deployment of docker images and how to consume the inference output. 
 
 ## Supported Platforms
 
@@ -28,12 +28,12 @@ This document describes implementation of FaaS inference samples (based on Pytho
 * Hardware:
   * Aaeon Up2 kit with integrated GPU (https://software.intel.com/en-us/blogs/2018/05/16/kits-to-accelerate-your-computer-vision-deployments) 
   * IEI 870 tank with integrated GPU (https://software.intel.com/en-us/blogs/2018/05/16/kits-to-accelerate-your-computer-vision-deployments)
-
+  * Accelerators: Arria10 1150 FPGA (https://www.buyaltera.com/Search/?keywords=arria+kit) , Intel Vision Accelerator Design Card (VAD)(https://www.ieiworld.com/mustang-f100/en/), Intel Vision Accelerator Design Card for FPGA (VAD-F) (https://www.intel.com/content/www/us/en/internet-of-things/solution-briefs/vision-accelerator-design-brief.html )
 ## Pre-requisites
 
 ### Pre-requisites for Intel Edge Devices
 
-1. Download and install OpenVINO R3 release Toolkit from https://software.intel.com/en-us/openvino-toolkit
+1. Download and install OpenVINO R4 release Toolkit from https://software.intel.com/en-us/openvino-toolkit (for FPGA, install Openvino fpga installer)
 2. For configuring GPU to use OpenVINO, follow the instructions under section “Additional Installation Steps for Processor Graphics (GPU)” at https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 3. Create a writeable <DATA_DIR> on the host device to hold input and output data. Copy any video files for input here. Note that this directory location should be accessible to all UIDs.
 	For example:
@@ -49,7 +49,8 @@ This document describes implementation of FaaS inference samples (based on Pytho
 	$ chmod a+r /opt/models
 	```
 
-5. Make a note of the <OPENVINO_DIR> which is where OpenVINO is installed (usually in /opt/intel/computer_vision_sdk_2018.3.343)
+5. Make a note of the <OPENVINO_DIR> which is where OpenVINO is installed (usually in /opt/intel/computer_vision_sdk_2018.4.420, for FPGA /opt/intel/computer_vision_sdk_fpga_2018.4.420)
+6. Additional instructions for FPGA. Make a note of <ALTERA_DIR>, the directory in which Altera OpenCL runtime and BSP are installed. Also, <DEVICE_DIR> which is /dev/aclhddlf_1150_sg10 for VAD card and /dev/acla10_ref0 for arria 10.
 
 ### Workstation pre-requisites for producing custom images
 1. Ubuntu/Linux OS
@@ -75,34 +76,24 @@ We provide the following Azure Iot samples:
 
 * For object detection, download Intel Edge optimized models available at https://github.com/intel/Edge-optimized-models. These models are provided as an example, but any custom pre-trained SSD models can be used with the object detection sample. 
 
-### Setting up & Running Model Optimizer
+### Setting up & running the Model Optimizer tool
 
-* For setting up Model Optimizer and converting deep learning models to Intermediate Representation (IR), follow the instructions at: https://software.intel.com/en-us/articles/OpenVINO-ModelOptimizer. 
-
+* Model Optimizer is a tool provided with the OpenVINO to convert a model to an Intermediate Representation (IR) format. A model must first be converted into an IR format to be parsable by the Inference Engine.
+* For setting up Model Optimizer and converting deep learning models to the IR format, follow the instructions at: https://software.intel.com/en-us/articles/OpenVINO-ModelOptimizer. 
 
 
 ## Configuring Azure Iot Edge
 
-### Install Iot Edge Runtime on development machine
-```
-sudo apt-get update
-sudo apt-get install iotedge
-```
-
-### Configure the cloud and device 
-
 <b>Pre-requisite</b>: Install Azure CLI to manage Azure cloud resources using command line interface.
 Refer to: https://docs.microsoft.com/en-gb/cli/azure/install-azure-cli-apt?view=azure-cli-latest
 
-For each Intel edge platform, we need to create a Azure Iot Hub and edge Device and Azure IotEdge Runtime
+For each Intel edge platform, we need to create a Azure Iot Hub and edge Device and Azure IotEdge Runtime. To create and configure the Iot Hub on Azure cloud and Azure Iot Edge on the IoT device, follow the instructions in the Azure documentation links below:
 
-* To create and configure the Iot Hub and Iot Edge Device, follow the instructions in the Azure documentation links below:
-	
-	<b>1. Create an IoT Hub.</b> Follow instructions at https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux#create-an-iot-hub 
+<b>1. Create an IoT Hub.</b> Follow instructions at https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux#create-an-iot-hub 
 
-	<b>2. Register an IoT Edge device instance on the cloud.</b> Follow instructions at: https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux#register-an-iot-edge-device
+<b>2. Register an IoT Edge device instance on the cloud.</b> Follow instructions at: https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux#register-an-iot-edge-device
 
-	<b>3. Install and configure Azure Iot Edge Runtime on edge platform.</b> Follow the instructions at: https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux#install-and-start-the-iot-edge-runtime
+<b>3. Install and configure Azure Iot Edge Runtime software on the edge device.</b> Follow the instructions at: https://docs.microsoft.com/en-us/azure/iot-edge/quickstart-linux#install-and-start-the-iot-edge-runtime
 
 
 ## Creating FaaS modules from code samples
@@ -177,18 +168,60 @@ For each Intel edge platform, we need to create a Azure Iot Hub and edge Device 
 		}
 	}
 	```
-	f. And in environmental variables, specify the following:
+    
+	For FPGA based devices (VAD-F or Arria 10 devkit), add the additional options to HostConfig shown below:
+	```json	
+	{
+	    "HostConfig": {
+			"Binds": [
+			"<ALTERA_DIR>:/opt/altera",
+			"/etc/OpenCL/vendors:/etc/OpenCL/vendors",
+			"/opt/Intel/OpenCL/Boards:/opt/Intel/OpenCL/Boards"
+			],
+	    		"Devices": [
+			{
+				"PathOnHost": "<DEVICE_DIR>",
+				"PathInContainer": "<DEVICE_DIR>",
+				"CgroupPermissions": "rwm"
+			}
+                       ]
+            }
+         }
+	```
+	where DEVICE_DIR=/dev/aclhddlf_1150_sg10 for VAD-F and DEVICE_DIR=/dev/acla10_ref0 for a10_devkit
+
+	
+ 	f. And in environmental variables, specify the following:
 
 	| NAME|VALUE|
 	| ---|---|
-	| DEVICE| Choose an accelerator device <br/> **CPU** or **GPU** |
+	| DEVICE| Choose an accelerator device <br/> **CPU** or **GPU** or **HETERO:FPGA,CPU**|
 	| INPUT | **cam** for Camera Input <br/> (or) <br/> full path to input file under the */opt/data/* folder<br/> when using camera input, add the camera device to the "Devices" above container options as follows <br/>`{"PathOnHost": "/dev/video0","PathInContainer": "/dev/video0","CgroupPermissions": "rwm"}` |
 	| MODEL_XML_PATH | Path to the .xml file of the model in OpenVINO IR format inside the */opt/model/* directory |
 	| CONNECTIONSTRING | Connection string for the IoT Edge device in Azure IoT Hub |
 	| OUTPUT_DIR| Path to folder to write output into within '/opt/data/' directory |
-
+ 
+	For FPGA based accelerator devices, specify the following additional environmental variables
+	
+	For a10_devkit:
+	
+	| NAME| VALUE|
+	| ---|---|
+	| DLA_AOCX| /opt/intel/computer_vision_sdk/bitstreams/a10_devkit_bitstreams/4-0_A10DK_FP16_AlexNet_GoogleNet.aocx ( For SSD use /opt/intel/computer_vision_sdk/bitstreams/a10_devkit_bitstreams/4-0_A10DK_FP16_TinyYolo_SSD300.aocx) |
+	| CL_CONTEXT_COMPILER_MODE_INTELFPGA| 3|
+	| LD_LIBRARY_PATH| /opt/altera/aocl-pro-rte/aclrte-linux64/board/a10_ref/linux64/lib:/opt/altera/aocl-pro-rte/aclrte-linux64/host/linux64/lib:<INSTALL_DIR>/opencv/share/OpenCV/3rdparty/lib:<INSTALL_DIR>/opencv/lib:/opt/intel/opencl:<INSTALL_DIR>/deployment_tools/inference_engine/external/cldnn/lib:<INSTALL_DIR>/deployment_tools/inference_engine/external/mkltiny_lnx/lib:<INSTALL_DIR>/deployment_tools/inference_engine/lib/ubuntu_16.04/intel64:<INSTALL_DIR>/deployment_tools/model_optimizer/model_optimizer_caffe/bin:<INSTALL_DIR>/openvx/lib |
+    
+	For VAD-F card:
+	
+	| NAME| VALUE|
+	| ---|---|
+	| DLA_AOCX| /opt/intel/computer_vision_sdk/bitstreams/a10_vision_design_bitstreams/4-0_PL1_FP16_Generic_AlexNet_GoogleNet_VGG.aocx ( For SSD use /opt/intel/computer_vision_sdk/bitstreams/a10_vision_design_bitstreams/4-0_PL1_FP16_TinyYolo_SSD300.aocx) |
+	| CL_CONTEXT_COMPILER_MODE_INTELFPGA| 3|
+	| LD_LIBRARY_PATH| /opt/altera/aocl-pro-rte/aclrte-linux64/board/hddlf_1150_sg1/linux64/lib:/opt/altera/aocl-pro-rte/aclrte-linux64/host/linux64/lib:<INSTALL_DIR>/opencv/share/OpenCV/3rdparty/lib:<INSTALL_DIR>/opencv/lib:/opt/intel/opencl:<INSTALL_DIR>/deployment_tools/inference_engine/external/cldnn/lib:<INSTALL_DIR>/deployment_tools/inference_engine/external/mkltiny_lnx/lib:<INSTALL_DIR>/deployment_tools/inference_engine/lib/ubuntu_16.04/intel64:<INSTALL_DIR>/deployment_tools/model_optimizer/model_optimizer_caffe/bin:<INSTALL_DIR>/openvx/lib |
+	
 	<br> 
-	Example of container create configuration with **Camera** input:
+	
+	Example of container create configuration with a **Camera** input and **VAD-F** accelerator:
 
 	```json	
 	{
@@ -196,13 +229,16 @@ For each Intel edge platform, we need to create a Azure Iot Hub and edge Device 
 			"Binds": [
 			"<OPENVINO_DIR>:/opt/intel/computer_vision_sdk",
 			"<DATA_DIR>:/opt/data",
-			"<MODEL_DIR>:/opt/model"
+			"<MODEL_DIR>:/opt/model",
+			"<ALTERA_DIR>:/opt/altera",
+			"/etc/OpenCL/vendors:/etc/OpenCL/vendors",
+			"/opt/Intel/OpenCL/Boards:/opt/Intel/OpenCL/Boards"
 			],
 
 			"Devices": [
 			{
-				"PathOnHost": "/dev/dri/renderD128",
-				"PathInContainer": "/dev/dri/renderD128",
+				"PathOnHost": "/dev/aclhddlf_1150_sg10",
+				"PathInContainer": "/dev/aclhddlf_1150_sg10",
 				"CgroupPermissions": "rwm"
 			},
 			{
@@ -215,9 +251,12 @@ For each Intel edge platform, we need to create a Azure Iot Hub and edge Device 
 	}
 	```
 
-	g. Back in the Add modules step, select Next.
-	h. In the Review Deployment step, select Submit.
-	i. After the deployment. Click refresh. You should see the device connected on the Iotedge device page and the module running
+	g. Back in the **Add modules** step, select **Next**.
+	
+	h. In the **Review Deployment** step, select **Submit**.
+	
+	i. After the deployment, click **Refresh**. You should see the device connected on the Iotedge device page and the module running
+	
 5. Verify via edgeAget logs for deployment status on the edge device: 
 ```
 docker container logs edgeAgent -f 

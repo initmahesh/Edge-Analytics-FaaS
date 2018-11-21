@@ -146,7 +146,7 @@ def iothub_client_object_detection_run():
         print("Loading IR to the plugin...")
         exec_net = plugin.load(network=net, num_requests=2)
         # Read and pre-process input image
-        n, c, h, w = net.inputs[input_blob]
+        n, c, h, w = net.inputs[input_blob].shape
         del net
         if args.input == 'cam':
             input_stream = 0

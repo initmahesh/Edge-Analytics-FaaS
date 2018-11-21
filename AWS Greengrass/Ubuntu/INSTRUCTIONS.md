@@ -35,13 +35,13 @@ Supported Platforms
   * Aaeon Up2 kit with integrated GPU (https://software.intel.com/en-us/blogs/2018/05/16/kits-to-accelerate-your-computer-vision-deployments)
   * IEI 870 tank with integrated GPU (https://software.intel.com/en-us/blogs/2018/05/16/kits-to-accelerate-your-computer-vision-deployments)
   * Any Greengrass certified Intel gateway with Atom Apollo Lake processor, Core Skylake and Xeon Skylake in https://aws.amazon.com/greengrass/faqs/. These platforms come with an integrated GPU that can be used for inference.
-  * Accelerators: Arria10 1150 FPGA (https://www.buyaltera.com/Search/?keywords=arria+kit)
+  * Accelerators: Arria10 1150 FPGA (https://www.buyaltera.com/Search/?keywords=arria+kit), Intel Vision Accelerator Design Cards (VAD-F) (https://www.intel.com/content/www/us/en/internet-of-things/solution-briefs/vision-accelerator-design-brief.html )
 
 
 Pre-requisites for Intel Edge Devices
 =================
 
-* Download and install OpenVINO R3 Toolkit from https://software.intel.com/en-us/openvino-toolkit
+* Download and install OpenVINO R4 Toolkit from https://software.intel.com/en-us/openvino-toolkit
 * For configuring GPU to use OpenVINO, follow the instructions under section “Additional Installation Steps for Processor Graphics (GPU)” at
 https://software.intel.com/en-us/articles/OpenVINO-Install-Linux#inpage-nav-4-1
 * Python 2.7 with opencv-python, numpy, boto3 (use the below commands to install the packages)
@@ -171,9 +171,15 @@ Configuring the Lambda Function
     Key | Value
     :------------- | :-------------
     LD_LIBRARY_PATH | /opt/altera/aocl-pro-rte/aclrte-linux64/board/a10_ref/linux64/lib:/opt/altera/aocl-pro-rte/aclrte-linux64/host/linux64/lib:<INSTALL_DIR>/opencv/share/OpenCV/3rdparty/lib:<INSTALL_DIR>/opencv/lib:/opt/intel/opencl:<INSTALL_DIR>/deployment_tools/inference_engine/external/cldnn/lib:<INSTALL_DIR>/deployment_tools/inference_engine/external/mkltiny_lnx/lib:<INSTALL_DIR>/deployment_tools/inference_engine/lib/ubuntu_16.04/intel64:<INSTALL_DIR>/deployment_tools/model_optimizer/model_optimizer_caffe/bin:<INSTALL_DIR>/openvx/lib
-    DLA_AOCX | <INSTALL_DIR>/a10_devkit_bitstreams/2-0-1_A10DK_FP11_SSD300.aocx
+    DLA_AOCX | /opt/intel/computer_vision_sdk/bitstreams/a10_devkit_bitstreams/4-0_A10DK_FP11_AlexNet_GoogleNet.aocx ( For SSD use /opt/intel/computer_vision_sdk/bitstreams/a10_devkit_bitstreams/4-0_A10DK_FP16_TinyYolo_SSD300.aocx) 
     CL_CONTEXT_COMPILER_MODE_INTELFPGA | 3
+* Use below LD_LIBRARY_PATH and additional environment variables for VAD-F FPGA:
 
+    Key | Value
+    :------------- | :-------------
+    LD_LIBRARY_PATH | /opt/altera/aocl-pro-rte/aclrte-linux64/board/hddlf_1150_sg1/linux64/lib:/opt/altera/aocl-pro-rte/aclrte-linux64/host/linux64/lib:<INSTALL_DIR>/opencv/share/OpenCV/3rdparty/lib:<INSTALL_DIR>/opencv/lib:/opt/intel/opencl:<INSTALL_DIR>/deployment_tools/inference_engine/external/cldnn/lib:<INSTALL_DIR>/deployment_tools/inference_engine/external/mkltiny_lnx/lib:<INSTALL_DIR>/deployment_tools/inference_engine/lib/ubuntu_16.04/intel64:<INSTALL_DIR>/deployment_tools/model_optimizer/model_optimizer_caffe/bin:<INSTALL_DIR>/openvx/lib
+    DLA_AOCX | /opt/intel/computer_vision_sdk/bitstreams/a10_vision_design_bitstreams/4-0_PL1_FP16_Generic_AlexNet_GoogleNet_VGG.aocx ( For SSD use /opt/intel/computer_vision_sdk/bitstreams/a10_vision_design_bitstreams/4-0_PL1_FP16_TinyYolo_SSD300.aocx)
+    CL_CONTEXT_COMPILER_MODE_INTELFPGA | 3
 
 * Add subscription to subscribe or publish messages from Greengrass lambda function by following the steps 10-14 in AWS Greengrass developer guide at: https://docs.aws.amazon.com/greengrass/latest/developerguide/config-lambda.html. The “Optional topic filter” field should be set by `PARAM_TOPIC_NAME` environment variable inside lambda configuration (See `Configuring the Lambda Function` section)
 
@@ -193,7 +199,7 @@ Local Resources
     ModelDir | Volume | <MODEL_DIR> to be specified by user. This directory should contain intermediate representation of pretrained models optimized by model optimizer.  For further information: refer to https://software.intel.com/en-us/articles/OpenVINO-ModelOptimizer .Supported file types: .xml (holds deep learning network architecture), .bin (contains model weights). eg:/opt/intel/model/<your_xml_file_name>.xml | Read-Only
     Webcam | Device | /dev/video0 : a standard format for USB cameras. For any other camera types, user has to specify the camera device path.| Read and Write
     DataDir | Volume | <DATA_DIR> to be specified by user. Holds both input and output data. For eg. /opt/intel/data/<your video input>. Validated with .mp4 format. Other custom video formats have to be tested and validated by the user. | Read and Write
-    OpenVINOPath | Volume |<INSTALL_DIR> where INSTALL_DIR is the OpenVINO installation directory. For eg. /opt/intel/computer_vision_sdk_2018.3.343/| Read-Only
+    OpenVINOPath | Volume |<INSTALL_DIR> where INSTALL_DIR is the OpenVINO installation directory. For eg. /opt/intel/computer_vision_sdk_2018.4.420/. For FPGA, /opt/intel/computer_vision_sdk_fpga_2018.4.420/| Read-Only
 
   * GPU:
 
@@ -205,7 +211,7 @@ Local Resources
 
     Name | Resource Type | Local Path | Access
     ------------- |------------- | ------------- | -------------
-    FPGA | Device | /dev/acla10_ref0 | Read and Write
+    FPGA | Device | /dev/acla10_ref0 for A10 devkit and  /dev/aclhddlf_1150_sg10 for VAD-F| Read and Write
     FPGA_DIR1 | Volume | /opt/Intel/OpenCL/Boards | Read-Only
     FPGA_DIR2 | Volume | /etc/OpenCL/vendors | Read-Only
 
